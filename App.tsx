@@ -19,48 +19,10 @@ import { Header } from './src/components/Header';
 import { MobileBottomNav } from './src/components/MobileBottomNav';
 import { Login } from './src/pages/Login';
 import { BizDashboard } from './src/pages/BizDashboard';
-import { Theme } from './src/theme';
+import { theme as Theme } from '@arli/tokens';
+import { getMerchantDictionary, toggleLang as flipLang, otherLangLabel, type Lang } from '@arli/i18n';
 
-const T: any = {
-  en: {
-    tagline: 'Merchant Portal',
-    phoneLabel: 'Phone number',
-    sendOtp: 'Send OTP',
-    or: 'or',
-    googleBtn: 'Continue with Google',
-    devfrogsBtn: 'Continue with Devfrogs',
-    otpTitle: 'Enter OTP',
-    otpSub: 'We sent a 4-digit code to',
-    verify: 'Verify & continue',
-    changeNumber: 'Change number',
-    onbQ1: 'What kind of business are you?',
-    onbQ2: 'Tell us about your shop',
-    shopNamePh: 'Shop Name',
-    shopDescPh: 'What do you sell or stitch?',
-    pincodePh: 'Pincode',
-    continueBtn: 'Continue',
-    launchBtn: 'Launch my shop',
-  },
-  hi: {
-    tagline: 'मर्चेंट पोर्टल',
-    phoneLabel: 'फ़ोन नंबर',
-    sendOtp: 'OTP भेजें',
-    or: 'या',
-    googleBtn: 'Google से जारी रखें',
-    devfrogsBtn: 'Devfrogs से जारी रखें',
-    otpTitle: 'OTP दर्ज करें',
-    otpSub: 'हमने कोड भेजा है',
-    verify: 'सत्यापित करें',
-    changeNumber: 'नंबर बदलें',
-    onbQ1: 'आपका व्यवसाय किस प्रकार का है?',
-    onbQ2: 'अपनी दुकान के बारे में बताएँ',
-    shopNamePh: 'दुकान का नाम',
-    shopDescPh: 'आप क्या बेचते या सिलते हैं?',
-    pincodePh: 'पिनकोड',
-    continueBtn: 'आगे बढ़ें',
-    launchBtn: 'दुकान शुरू करें',
-  }
-};
+
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -73,7 +35,7 @@ export default function App() {
   });
 
   const [screen, setScreen] = useState('login');
-  const [lang, setLang] = useState<'en' | 'hi'>('en');
+  const [lang, setLang] = useState<Lang>('en');
   const [loggedIn, setLoggedIn] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
   const [_shopDetails, setShopDetails] = useState({ name: '', pin: '' });
@@ -87,9 +49,6 @@ export default function App() {
     );
   }
 
-  const toggleLang = () => {
-    setLang((prev) => (prev === 'en' ? 'hi' : 'en'));
-  };
 
   const handleNavigate = (target: string) => {
     if (!loggedIn && target === 'home') {
@@ -99,17 +58,17 @@ export default function App() {
     }
   };
 
-  const currentT = T[lang];
+  const currentT = getMerchantDictionary(lang);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="dark" />
       <Header
         t={currentT}
-        langLabel={lang === 'en' ? 'हिं' : 'EN'}
+        langLabel={otherLangLabel(lang)}
         loggedIn={loggedIn}
         onNavigate={handleNavigate}
-        onToggleLang={toggleLang}
+        onToggleLang={() => setLang(flipLang)}
       />
 
       <View style={styles.body}>

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert, StyleSheet, Switch, Image } from 'react-native';
-import { Order, Message } from '../types';
-import { Theme } from '../theme';
+import { type ListingCategory, type Order, type OrderStatus, ORDER_STATUS } from '@arli/contracts';
+import { getMerchantDictionary, type Lang, type MerchantDictionary } from '@arli/i18n';
+import { api } from '../api';
+import type { Message } from '../types';
+import { theme as Theme } from '@arli/tokens';
 
 interface BizDashboardProps {
   t: any;
@@ -35,102 +38,14 @@ interface DesignRequest {
   base: string;
 }
 
-const LOCAL_T: Record<'en' | 'hi', any> = {
-  en: {
-    bizBadge: 'Business',
-    welcomeTitle: 'Grow your shop on ARLI',
-    welcomeSub: 'List your fabrics, garments and tailoring. Receive orders with digital measurements, chat with customers, and get discovered nearby.',
-    phoneLabel: 'Phone number', sendOtp: 'Send OTP', regNote: 'New here? Registration takes about 5 minutes.',
-    otpTitle: 'Enter OTP', otpSub: 'Code sent to', otpHint: 'Demo: any 4 digits work', verify: 'Verify & continue',
-    openCustomer: 'Open the customer app',
-    onbQ1: 'What kind of business are you?', onbQ2: 'Tell us about your shop',
-    onbQ3: 'Tax & government details', onbQ3Sub: 'Required by Indian marketplace rules. Your details are verified before payouts are enabled.',
-    onbQ4: 'Bank & payouts', onbQ4Sub: 'Where we send your money once online payments (Razorpay) go live. Orders are currently pay-at-shop.',
-    onbQ5: 'Review & submit',
-    shopNameLabel: 'Shop name', shopNamePh: 'e.g. Meera Tailors', shopDescPh: 'What do you sell or stitch?', shopAddrPh: 'Shop address (street, area, city)',
-    pincodePh: 'Pincode', continueBtn: 'Continue', backBtn: 'Back',
-    noGstLabel: 'I don’t have a GSTIN yet',
-    noGstNote: 'Small sellers under ₹40 lakh annual turnover (₹20 lakh for services) can sell within their state without GST. You can add your GSTIN later — until then your shop shows a "GST pending" note and can’t sell outside your state.',
-    bizStructLabel: 'Business structure', structProp: 'Sole proprietorship', structPartner: 'Partnership', structPvt: 'Private Limited', structSelf: 'Self-employed / artisan',
-    udyamLabel: 'Udyam (MSME) number — optional', udyamNote: 'Free MSME registration unlocks government scheme benefits.',
-    acctNameLabel: 'Account holder name', acctNamePh: 'As per bank records', acctNumLabel: 'Account number', upiLabel: 'UPI ID — optional',
-    declaration: 'I confirm the details above are correct, I am authorised to operate this business, and I agree to ARLI’s seller terms, commission schedule and India’s e-commerce consumer-protection rules (returns, grievance contact, no fake reviews).',
-    submitBtn: 'Submit application',
-    submittedTitle: 'Application submitted!', submittedSub: 'We verify your PAN, GSTIN and bank details with government records.', verify24: 'Verification usually completes within 24 hours',
-    goDash: 'Go to dashboard',
-    pendingTitle: 'Verification pending', pendingNote: 'your listings are live; payouts and the verified badge unlock after approval.',
-    ordersToday: 'Orders today', recentOrders: 'Recent orders',
-    dashOrders: 'Orders', dashListings: 'Listings', dashChats: 'Chats', dashDesigns: 'Designs', dashAds: 'Ads', dashStats: 'Analytics',
-    moreTitle: 'More', complianceTitle: 'Compliance & documents',
-    complianceNote: 'Keep your GSTIN active and file returns on time. ARLI issues a monthly commission invoice you can claim input credit on.',
-    measAttached: 'Measurements attached',
-    addListing: 'Add', listingNamePh: 'Listing name', priceLabel: 'Price (₹)', inStock: 'in stock', viewsWord: 'views',
-    adsTitle: 'Promote your listings', adsSub: 'Set a daily budget and your listings appear at the top of search, marked Sponsored.',
-    dailyBudget: 'Daily budget', startAd: 'Start ad', stopAd: 'Stop ad', adRunning: 'Ad running', estReach: 'est. daily views',
-    statViews: 'Views', statOrders: 'Orders', statRevenue: 'Revenue', statChats: 'Chats', last30: 'Last 30 days', viewsPerListing: 'Views per listing',
-    replyBtn: 'Reply', unreadWord: 'new',
-    custRequests: 'Customer design requests', acceptBtn: 'Accept', acceptedMark: 'Accepted', addDesign: 'Add', designNamePh: 'Design name',
-    invoiceBtn: 'Invoice', slipBtn: 'Delivery slip', invoiceTitle: 'TAX INVOICE', slipTitle: 'DELIVERY SLIP',
-    billedTo: 'Billed to', deliverTo: 'Deliver to', itemWord: 'Item', amountWord: 'Amount', total: 'Total',
-    downloadBtn: 'Download PDF', closeBtn: 'Close', signature: 'Receiver signature',
-    payAtShopNote: 'Pay at shop · cash or UPI on delivery', docDownloaded: 'Downloaded (demo)',
-    stPlaced: 'Placed', stAccepted: 'Accepted', stProgress: 'In progress', stReady: 'Ready', stDelivered: 'Delivered',
-    tabHome: 'Home', tabOrders: 'Orders', tabListings: 'Listings', tabChats: 'Chats', tabMore: 'More',
-    typeTailor: 'Tailor', typeWholesaler: 'Fabric wholesaler', typeBoutique: 'Boutique', typeDesigner: 'Fashion designer', typeGarment: 'Garment shop', typeWarehouse: 'Warehouse',
-    logout: 'Log out',
-    gstPending: 'GST pending', verified: 'Verified', pendingWord: 'Pending',
-  },
-  hi: {
-    bizBadge: 'बिज़नेस',
-    welcomeTitle: 'ARLI पर अपनी दुकान बढ़ाएँ', welcomeSub: 'अपने कपड़े, गारमेंट और सिलाई लिस्ट करें। डिजिटल नाप के साथ ऑर्डर पाएँ, ग्राहकों से चैट करें, और आस-पास के ग्राहकों तक पहुँचें।',
-    phoneLabel: 'फ़ोन नंबर', sendOtp: 'OTP भेजें', regNote: 'नए हैं? रजिस्ट्रेशन में लगभग 5 मिनट लगते हैं।',
-    otpTitle: 'OTP डालें', otpSub: 'कोड भेजा गया', otpHint: 'डेमो: कोई भी 4 अंक चलेंगे', verify: 'सत्यापित करें',
-    openCustomer: 'ग्राहक ऐप खोलें',
-    onbQ1: 'आपका व्यवसाय किस तरह का है?', onbQ2: 'अपनी दुकान के बारे में बताएँ',
-    onbQ3: 'टैक्स और सरकारी विवरण', onbQ3Sub: 'भारतीय मार्केटप्लेस नियमों के अनुसार ज़रूरी। भुगतान शुरू होने से पहले आपके विवरण सत्यापित होते हैं।',
-    onbQ4: 'बैंक और भुगतान', onbQ4Sub: 'ऑनलाइन भुगतान (Razorpay) शुरू होने पर आपका पैसा यहाँ आएगा। अभी ऑर्डर दुकान-पर-भुगतान हैं।',
-    onbQ5: 'जाँचें और सबमिट करें',
-    shopNameLabel: 'दुकान का नाम', shopNamePh: 'जैसे मीरा टेलर्स', shopDescPh: 'आप क्या बेचते या सिलते हैं?', shopAddrPh: 'दुकान का पता (गली, इलाक़ा, शहर)',
-    pincodePh: 'पिनकोड', continueBtn: 'आगे बढ़ें', backBtn: 'पीछे',
-    noGstLabel: 'मेरे पास अभी GSTIN नहीं है',
-    noGstNote: '₹40 लाख (सेवाओं के लिए ₹20 लाख) से कम सालाना टर्नओवर वाले छोटे विक्रेता अपने राज्य में बिना GST बेच सकते हैं। GSTIN बाद में जोड़ सकते हैं — तब तक दुकान पर "GST लंबित" नोट दिखेगा और राज्य के बाहर बिक्री नहीं होगी।',
-    bizStructLabel: 'व्यवसाय का ढांचा', structProp: 'एकल स्वामित्व', structPartner: 'साझेदारी', structPvt: 'प्राइवेट लिमिटेड', structSelf: 'स्व-रोज़गार / कारीगर',
-    udyamLabel: 'उद्यम (MSME) नंबर — वैकल्पिक', udyamNote: 'मुफ़्त MSME रजिस्ट्रेशन से सरकारी योजनाओं का लाभ मिलता है।',
-    acctNameLabel: 'खाताधारक का नाम', acctNamePh: 'बैंक रिकॉर्ड के अनुसार', acctNumLabel: 'खाता संख्या', upiLabel: 'UPI ID — वैकल्पिक',
-    declaration: 'मैं पुष्टि करता/करती हूँ कि ऊपर दिए विवरण सही हैं, मैं यह व्यवसाय चलाने के लिए अधिकृत हूँ, और ARLI की विक्रेता शर्तों, कमीशन और भारत के ई-कॉमर्स उपभोक्ता-संरक्षण नियमों (रिटर्न, शिकायत संपर्क, नकली समीक्षा नहीं) से सहमत हूँ।',
-    submitBtn: 'आवेदन सबमिट करें',
-    submittedTitle: 'आवेदन सबमिट हो गया!', submittedSub: 'हम आपका PAN, GSTIN और बैंक विवरण सरकारी रिकॉर्ड से सत्यापित करते हैं।', verify24: 'सत्यापन आमतौर पर 24 घंटे में पूरा होता है',
-    goDash: 'डैशबोर्ड खोलें',
-    pendingTitle: 'सत्यापन लंबित', pendingNote: 'आपकी लिस्टिंग लाइव हैं; भुगतान और वेरिफ़ाइड बैज मंज़ूरी के बाद मिलेंगे।',
-    ordersToday: 'आज के ऑर्डर', recentOrders: 'हाल के ऑर्डर',
-    dashOrders: 'ऑर्डर', dashListings: 'लिस्टिंग', dashChats: 'चैट', dashDesigns: 'डिज़ाइन', dashAds: 'विज्ञापन', dashStats: 'एनालिटिक्स',
-    moreTitle: 'और', complianceTitle: 'अनुपालन और दस्तावेज़',
-    complianceNote: 'अपना GSTIN सक्रिय रखें और समय पर रिटर्न भरें। ARLI हर महीने कमीशन इनवॉइस देता है जिस पर आप इनपुट क्रेडिट ले सकते हैं।',
-    measAttached: 'नाप जुड़ा है',
-    addListing: 'जोड़ें', listingNamePh: 'लिस्टिंग का नाम', priceLabel: 'क़ीमत (₹)', inStock: 'स्टॉक में', viewsWord: 'व्यू',
-    adsTitle: 'अपनी लिस्टिंग प्रमोट करें', adsSub: 'दैनिक बजट तय करें और आपकी लिस्टिंग सर्च में सबसे ऊपर "प्रायोजित" दिखेगी।',
-    dailyBudget: 'दैनिक बजट', startAd: 'विज्ञापन शुरू करें', stopAd: 'विज्ञापन रोकें', adRunning: 'विज्ञापन चल रहा है', estReach: 'अनुमानित दैनिक व्यू',
-    statViews: 'व्यू', statOrders: 'ऑर्डर', statRevenue: 'आय', statChats: 'चैट', last30: 'पिछले 30 दिन', viewsPerListing: 'हर लिस्टिंग के व्यू',
-    replyBtn: 'जवाब दें', unreadWord: 'नई',
-    custRequests: 'ग्राहकों के डिज़ाइन अनुरोध', acceptBtn: 'स्वीकारें', acceptedMark: 'स्वीकृत', addDesign: 'जोड़ें', designNamePh: 'डिज़ाइन का नाम',
-    invoiceBtn: 'इनवॉइस', slipBtn: 'डिलीवरी स्लिप', invoiceTitle: 'टैक्स इनवॉइस', slipTitle: 'डिलीवरी स्लिप',
-    billedTo: 'बिल प्राप्तकर्ता', deliverTo: 'डिलीवरी पता', itemWord: 'आइटम', amountWord: 'आँकड़ा', total: 'कुल',
-    downloadBtn: 'PDF डाउनलोड', closeBtn: 'बंद करें', signature: 'प्राप्तकर्ता के हस्ताक्षर',
-    payAtShopNote: 'दुकान पर भुगतान · डिलीवरी पर नकद या UPI', docDownloaded: 'डाउनलोड हो गया (डेमो)',
-    stPlaced: 'प्लेस्ड', stAccepted: 'स्वीकृत', stProgress: 'बन रहा है', stReady: 'तैयार', stDelivered: 'डिलीवर',
-    tabHome: 'होम', tabOrders: 'ऑर्डर', tabListings: 'लिस्टिंग', tabChats: 'चैट', tabMore: 'और',
-    typeTailor: 'दर्ज़ी', typeWholesaler: 'कपड़ा थोक विक्रेता', typeBoutique: 'बुटीक', typeDesigner: 'फ़ैशन डिज़ाइनर', typeGarment: 'गारमेंट दुकान', typeWarehouse: 'वेयरहाउस',
-    logout: 'लॉग आउट',
-    gstPending: 'GST लंबित', verified: 'सत्यापित', pendingWord: 'लंबित',
-  }
-};
+
 
 export const BizDashboard: React.FC<BizDashboardProps> = ({
   lang,
   isRegistered,
   onRegister,
 }) => {
-  const currentT = LOCAL_T[lang];
+  const currentT: MerchantDictionary = getMerchantDictionary(lang);
 
   // Local Onboarding Screens State
   const [localScreen, setLocalScreen] = useState<'onb' | 'submitted'>('onb');
@@ -166,7 +81,7 @@ export const BizDashboard: React.FC<BizDashboardProps> = ({
   // Forms and Modals
   const [newLName, setNewLName] = useState('');
   const [newLPrice, setNewLPrice] = useState('');
-  const [newLCat, setNewLCat] = useState('fabric');
+  const [newLCat, setNewLCat] = useState<ListingCategory>('fabric');
 
   const [chats, setChats] = useState<Message[]>([
     { align: 'flex-start', bg: '#fff', fg: Theme.textPrimary, text: 'Hi tailor! Can I get the status of Varanasi Kurta?' }
@@ -206,29 +121,23 @@ export const BizDashboard: React.FC<BizDashboardProps> = ({
   }, [isRegistered]);
 
   const loadListings = () => {
-    fetch('http://localhost:5000/api/listings')
-      .then((res) => res.json())
+    api.listings
+      .list()
       .then((data) => {
-        const updated = data.map((item: any, i: number) => ({
+        // Demo-only view/stock metadata; not yet stored server-side.
+        setListings(data.map((item, i) => ({
           ...item,
-          views: item.views || (105 + i * 35),
-          stock: item.stock || (item.cat === 'fabric' ? '30 m' : '—'),
-        }));
-        setListings(updated);
+          views: 105 + i * 35,
+          stock: item.cat === 'fabric' ? '30 m' : '—',
+        })));
       })
       .catch(() => setListings([]));
   };
 
   const loadOrders = () => {
-    fetch('http://localhost:5000/api/orders')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.length === 0) {
-          setOrders(fallbackOrders);
-        } else {
-          setOrders(data);
-        }
-      })
+    api.orders
+      .list()
+      .then((data) => setOrders(data.length === 0 ? fallbackOrders : data))
       .catch(() => setOrders(fallbackOrders));
   };
 
@@ -330,11 +239,8 @@ export const BizDashboard: React.FC<BizDashboardProps> = ({
       desc: { en: 'Bespoke tailor collection', hi: 'दर्जी कलेक्शन' }
     };
 
-    fetch('http://localhost:5000/api/listings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
+    api.listings
+      .create(payload)
       .then(() => {
         Alert.alert('Success', 'Listing added successfully');
         setNewLName('');
@@ -381,8 +287,10 @@ export const BizDashboard: React.FC<BizDashboardProps> = ({
   };
 
   const handleAdvanceOrderStatus = (orderId: string) => {
+    const next = (st: OrderStatus): OrderStatus =>
+      (Math.min(ORDER_STATUS.Delivered, st + 1) as OrderStatus);
     setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status: Math.min(4, o.status + 1) } : o))
+      prev.map((o) => (o.id === orderId ? { ...o, status: next(o.status) } : o))
     );
   };
 
