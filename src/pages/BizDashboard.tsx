@@ -3,6 +3,7 @@ import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert, StyleSheet,
 import { type ListingCategory, type Order, type OrderStatus, ORDER_STATUS } from '@arli/contracts';
 import { getMerchantDictionary, type Lang, type MerchantDictionary } from '@arli/i18n';
 import { api } from '../api';
+import { MobileBottomNav } from '../components/MobileBottomNav';
 import type { Message } from '../types';
 import { theme as Theme } from '@arli/tokens';
 
@@ -903,28 +904,15 @@ export const BizDashboard: React.FC<BizDashboardProps> = ({
         )}
       </ScrollView>
 
-      {/* Persistent Bottom Nav simulation */}
-      <View style={styles.bottomNav}>
-        {[
-          { id: 'home', label: currentT.tabHome, icon: '🏠' },
-          { id: 'orders', label: currentT.tabOrders, icon: '📦' },
-          { id: 'listings', label: currentT.tabListings, icon: '🏷️' },
-          { id: 'chats', label: currentT.tabChats, icon: '💬' },
-          { id: 'more', label: currentT.moreTitle, icon: '⋯' }
-        ].map((tab) => {
-          const isSelected = activeTab === tab.id || (tab.id === 'more' && ['designs', 'ads', 'stats', 'compliance'].includes(activeTab));
-          return (
-            <TouchableOpacity
-              key={tab.id}
-              onPress={() => handleGoTab(tab.id as any)}
-              style={styles.navButton}
-            >
-              <Text style={{ fontSize: 18, opacity: isSelected ? 1 : 0.4 }}>{tab.icon}</Text>
-              <Text style={{ fontSize: 9.5, fontWeight: 'bold', color: isSelected ? Theme.colorAccent : Theme.textMuted }}>{tab.label}</Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
+      {/* Floating glass nav — the app's design language. Its tab ids match
+          activeTab, and 'more' stays lit for the sections it groups. */}
+      <MobileBottomNav
+        currentTab={
+          ['designs', 'ads', 'stats', 'compliance'].includes(activeTab) ? 'more' : activeTab
+        }
+        onSelectTab={(tab) => handleGoTab(tab as any)}
+        t={currentT}
+      />
 
       {/* Absolute Invoice Modal Overlay */}
       {invoiceOrder && (
@@ -1152,7 +1140,8 @@ const styles = StyleSheet.create({
   },
   scroll: {
     paddingHorizontal: 16,
-    paddingBottom: 80,
+    // Clears the floating nav pill (bottom: 16 + height: 60).
+    paddingBottom: 96,
   },
   listingRow: {
     backgroundColor: '#fff',
@@ -1213,6 +1202,7 @@ const styles = StyleSheet.create({
   chatScroll: {
     padding: 12,
     gap: 8,
+    paddingBottom: 96,
   },
   chatBubble: {
     padding: 8,
@@ -1263,24 +1253,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontFamily: Theme.fontSansBold,
     fontSize: 12,
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 60,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: Theme.borderColor,
-    flexDirection: 'row',
-    paddingBottom: 4,
-  },
-  navButton: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 2,
   },
   sectionHeader: {
     fontSize: 15,
