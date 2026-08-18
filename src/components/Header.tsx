@@ -38,11 +38,11 @@ export const Header: React.FC<HeaderProps> = ({
 
           {!loggedIn ? (
             <TouchableOpacity onPress={() => onNavigate('login')} style={styles.loginBtn}>
-              <Text style={styles.loginText}>Sign In</Text>
+              <Text style={styles.loginText}>{t.signIn}</Text>
             </TouchableOpacity>
           ) : (
             <View style={styles.merchantBadge}>
-              <Text style={styles.merchantText}>🏪 Seller Active</Text>
+              <Text style={styles.merchantText}>🏪 {t.sellerActive}</Text>
             </View>
           )}
         </View>

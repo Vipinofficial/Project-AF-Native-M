@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, ActivityIndicator, SafeAreaView } from 'react-native';
+import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 // Font loaders from @expo-google-fonts
 import {
@@ -60,7 +61,8 @@ export default function App() {
   const currentT = getMerchantDictionary(lang);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.safeArea}>
       <StatusBar style="dark" />
       <Header
         t={currentT}
@@ -93,7 +95,8 @@ export default function App() {
           />
         )}
       </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 

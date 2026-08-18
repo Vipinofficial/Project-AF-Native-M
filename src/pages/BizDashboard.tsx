@@ -554,7 +554,7 @@ export const BizDashboard: React.FC<BizDashboardProps> = ({
             </View>
 
             {/* Quick Actions Grid */}
-            <Text style={styles.sectionHeader}>Quick Actions</Text>
+            <Text style={styles.sectionHeader}>{currentT.quickActions}</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginVertical: 8 }}>
               {[
                 { label: currentT.tabListings, icon: '🏷️', id: 'listings' },
@@ -663,7 +663,7 @@ export const BizDashboard: React.FC<BizDashboardProps> = ({
               <TextInput value={newLName} onChangeText={setNewLName} placeholder={currentT.listingNamePh} style={styles.input} />
               <TextInput value={newLPrice} onChangeText={setNewLPrice} placeholder={currentT.priceLabel} keyboardType="numeric" style={styles.input} />
               <TouchableOpacity onPress={handleAddListing} style={styles.primaryBtn}>
-                <Text style={styles.primaryBtnText}>Publish</Text>
+                <Text style={styles.primaryBtnText}>{currentT.publishBtn}</Text>
               </TouchableOpacity>
             </View>
 
@@ -695,7 +695,7 @@ export const BizDashboard: React.FC<BizDashboardProps> = ({
             <View style={styles.chatInputRow}>
               <TextInput value={chatInput} onChangeText={setChatInput} placeholder="Type message to client…" style={styles.chatInput} />
               <TouchableOpacity onPress={handleSendChat} style={styles.chatSendBtn}>
-                <Text style={styles.chatSendText}>Send</Text>
+                <Text style={styles.chatSendText}>{currentT.sendBtn}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -746,21 +746,21 @@ export const BizDashboard: React.FC<BizDashboardProps> = ({
                     onPress={() => handleAcceptDesignReq(i)}
                     style={{ backgroundColor: Theme.colorSuccess, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6 }}
                   >
-                    <Text style={{ color: '#fff', fontSize: 11, fontWeight: 'bold' }}>Accept</Text>
+                    <Text style={{ color: '#fff', fontSize: 11, fontWeight: 'bold' }}>{currentT.acceptShort}</Text>
                   </TouchableOpacity>
                 )}
               </View>
             ))}
 
             <View style={styles.card}>
-              <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 8 }}>Add Catalog Design</Text>
+              <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 8 }}>{currentT.addCatalogDesign}</Text>
               <TextInput value={newDesignName} onChangeText={setNewDesignName} placeholder="Design name" style={styles.input} />
               <TouchableOpacity onPress={handleAddDesign} style={styles.primaryBtn}>
                 <Text style={styles.primaryBtnText}>+ Add Design</Text>
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.sectionHeader}>Designs Catalog</Text>
+            <Text style={styles.sectionHeader}>{currentT.designsCatalog}</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
               {bizDesigns.map((d, i) => (
                 <View key={i} style={{ width: '31%', backgroundColor: '#fff', borderWidth: 1, borderColor: Theme.borderColor, borderRadius: 8, overflow: 'hidden' }}>
@@ -954,8 +954,8 @@ export const BizDashboard: React.FC<BizDashboardProps> = ({
             </View>
 
             <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: Theme.borderColor, paddingBottom: 4, marginBottom: 6 }}>
-              <Text style={{ fontSize: 9, fontWeight: 'bold', color: Theme.textMuted }}>Item</Text>
-              <Text style={{ fontSize: 9, fontWeight: 'bold', color: Theme.textMuted }}>Amount</Text>
+              <Text style={{ fontSize: 9, fontWeight: 'bold', color: Theme.textMuted }}>{currentT.itemCol}</Text>
+              <Text style={{ fontSize: 9, fontWeight: 'bold', color: Theme.textMuted }}>{currentT.amountCol}</Text>
             </View>
 
             {(() => {
