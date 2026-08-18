@@ -16,7 +16,6 @@ import {
 } from '@expo-google-fonts/instrument-sans';
 
 import { Header } from './src/components/Header';
-import { MobileBottomNav } from './src/components/MobileBottomNav';
 import { Login } from './src/pages/Login';
 import { BizDashboard } from './src/pages/BizDashboard';
 import { theme as Theme } from '@arli/tokens';
@@ -94,12 +93,6 @@ export default function App() {
           />
         )}
       </View>
-
-      <MobileBottomNav
-        currentTab="home"
-        onSelectTab={(tab) => handleNavigate(tab === 'home' ? 'home' : 'home')}
-        loggedIn={loggedIn}
-      />
     </SafeAreaView>
   );
 }
