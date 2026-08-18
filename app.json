@@ -21,10 +21,11 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "in.arli.merchant",
-      "versionCode": 1,
       "permissions": [
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ]
     },
     "web": {
@@ -38,6 +39,12 @@
           "locationWhenInUsePermission": "ARLI uses your location to place your shop on the map so nearby customers can find it."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1b829ac2-397e-4fcd-a8bc-50e8e23ff158"
+      }
+    },
+    "owner": "vipinkumarsoni"
   }
 }
