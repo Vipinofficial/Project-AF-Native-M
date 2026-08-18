@@ -1,13 +1,16 @@
 {
   "expo": {
-    "name": "mobile-business",
-    "slug": "mobile-business",
+    "name": "ARLI Merchant",
+    "slug": "arli-merchant",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "ARLI uses your location to place your shop on the map so nearby customers can find it."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -16,13 +19,25 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "in.arli.merchant",
+      "versionCode": 1,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "ARLI uses your location to place your shop on the map so nearby customers can find it."
+        }
+      ]
     ]
   }
 }
