@@ -24,7 +24,7 @@ export const Header: React.FC<HeaderProps> = ({
           <View style={styles.logoBox}>
             <View style={styles.brandTitleRow}>
               <Text style={styles.brandName}>ARLI</Text>
-              <Text style={styles.subBrand}>FASHION</Text>
+              <Text style={styles.subBrand}>BRAND</Text>
             </View>
             <Text style={styles.vendorText}>by fashion vendors</Text>
           </View>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Line, Polyline } from 'react-native-svg';
 import { theme as Theme } from '@arli/tokens';
 import type { MerchantDictionary } from '@arli/i18n';
@@ -70,8 +71,15 @@ export const MobileBottomNav: React.FC<MerchantMobileBottomNavProps> = ({
     },
   ];
 
+  // A hardcoded `bottom: 16` ignored the device's actual system-UI height: on
+  // gesture navigation Android reserves a taller strip at the bottom for the
+  // gesture handle than a fixed constant accounts for, and the pill (or its
+  // labels) can end up crowded against or under it. insets.bottom is the real
+  // reserved height for THIS device, so 16 stays genuine clearance above it.
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.floatingNavContainer}>
+    <View style={[styles.floatingNavContainer, { bottom: 16 + insets.bottom }]}>
       <View style={styles.floatingNavPill}>
         {tabs.map((tab) => {
           const isActive = currentTab === tab.id;
@@ -97,7 +105,7 @@ export const MobileBottomNav: React.FC<MerchantMobileBottomNavProps> = ({
 const styles = StyleSheet.create({
   floatingNavContainer: {
     position: 'absolute',
-    bottom: 16,
+    // bottom is supplied inline above (16 + the device's real safe-area inset).
     left: 16,
     right: 16,
     alignItems: 'center',
